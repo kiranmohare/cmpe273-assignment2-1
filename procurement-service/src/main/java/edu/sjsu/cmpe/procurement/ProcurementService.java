@@ -8,6 +8,7 @@ import com.yammer.dropwizard.config.Bootstrap;
 import com.yammer.dropwizard.config.Environment;
 
 import edu.sjsu.cmpe.procurement.config.ProcurementServiceConfiguration;
+import de.spinscale.dropwizard.jobs.JobsBundle;
 
 public class ProcurementService extends Service<ProcurementServiceConfiguration> {
 
@@ -20,6 +21,7 @@ public class ProcurementService extends Service<ProcurementServiceConfiguration>
     @Override
     public void initialize(Bootstrap<ProcurementServiceConfiguration> bootstrap) {
 	bootstrap.setName("procurement-service");
+	bootstrap.addBundle(new JobsBundle("edu.sjsu.cmpe.procurement"));
     }
 
     @Override
