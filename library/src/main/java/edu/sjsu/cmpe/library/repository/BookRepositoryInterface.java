@@ -46,8 +46,7 @@ public interface BookRepositoryInterface {
      * @param isbn
      *            an ISBN of the book to be deleted
      */
-    //void delete(Long isbn);
-    //void producer(String tempMsg) throws JMSException;
+    
 	Book updateBookStatus(Book book, Status tempStatus) throws JMSException;
 	
     void addBook(Book tempBook);

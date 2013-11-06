@@ -78,9 +78,9 @@ public class Listener {
 			}
 			connection.close();
 			if(!arrivals.isEmpty()) {
-			//System.out.println(arrivals);
+			
 			for(String arrival:arrivals){
-				//System.out.println("couting"+i++);
+				
 				isbn = Long.parseLong(arrival.split(":")[0]);
 				bookTitle = arrival.split(":")[1].replaceAll("^\"|\"$", "");
 				bookCategory = arrival.split(":")[2].replaceAll("^\"|\"$", "");
@@ -104,7 +104,7 @@ public class Listener {
 					
 				}
 				else {
-					System.out.println("reachable, changing to available");
+					System.out.println("reachable, changing the book status to available");
 					tempBook.setStatus(Status.available);
 				}
 				

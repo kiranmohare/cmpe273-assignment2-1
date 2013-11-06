@@ -29,22 +29,24 @@ import edu.sjsu.cmpe.library.repository.BookRepositoryInterface;
 @Path("/v1/books")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class BookResource {
-    /** bookRepository instance */
+
+public class BookResource 
+
+{
+	/** bookRepository instance */
     private final BookRepositoryInterface bookRepository;
     private final BookRepository bookRepo;
-    //private final BookRepositoryInterface bookrepoactions;
-    /**
+     /**
      * BookResource constructor
      * 
      * @param bookRepository
      *            a BookRepository instance
      */
     public BookResource(BookRepositoryInterface bookRepository,BookRepository bookRepo) {
-   this.bookRepository = bookRepository;
+    this.bookRepository = bookRepository;
 	this.bookRepo = bookRepo;
-	//this.bookrepoactions = bookrepoactions;
-	}
+	
+}
 
     @GET
     @Path("/{isbn}")
@@ -98,6 +100,7 @@ public class BookResource {
 		book=bookRepository.updateBookStatus(book, status);
 	}
 
+	
 	BookDto bookResponse = new BookDto(book);
 	String location = "/books/" + book.getIsbn();
 	bookResponse.addLink(new LinkDto("view-book", location, "GET"));

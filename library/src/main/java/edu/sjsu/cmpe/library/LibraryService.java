@@ -38,7 +38,9 @@ public class LibraryService extends Service<LibraryServiceConfiguration> {
 
     @Override
     public void run(LibraryServiceConfiguration configuration,
-	    Environment environment) throws Exception {
+	    Environment environment) throws Exception 
+	{
+    	
 	// This is how you pull the configurations from library_x_config.yml
 	String queueName = configuration.getStompQueueName();
 	String topicName = configuration.getStompTopicName();
@@ -56,21 +58,17 @@ public class LibraryService extends Service<LibraryServiceConfiguration> {
             apolloHost+"\nApollo Port: "+apolloPort);
 
 	/** Root API */
-	/*environment.addResource(RootResource.class);
+		
+    environment.addResource(RootResource.class);
+    
 	/** Books APIs */
-//	BookRepositoryInterface bookRepository = new BookRepository(configuration);
-//	BookRepository book=new BookRepository(configuration);
-//	environment.addResource(new BookResource(bookRepository));
-//	//environment.addResource(new BookResource(bookRepository,bookrepoactions));
-
-	/** UI Resources */		
-environment.addResource(RootResource.class);
-	/** Books APIs */
+    
 	BookRepositoryInterface bookRepository = new BookRepository(configuration);
 	BookRepository bookrepoactions=new BookRepository(configuration);
 	environment.addResource(new BookResource(bookRepository,bookrepoactions));
 
 	/** UI Resources */
+	
 	environment.addResource(new HomeResource(bookRepository));	
 	final Listener listener = new Listener(configuration,bookRepository);
 	ExecutorService executor = Executors.newFixedThreadPool(1);
@@ -82,14 +80,14 @@ environment.addResource(RootResource.class);
 		try {
 			listener.listener();
 		} catch (JMSException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}
 	    }
 	    };
+	    
 	    executor.execute(backgroundTask);
-	    //listener.listener();
-    
+	    
 }
 
     }

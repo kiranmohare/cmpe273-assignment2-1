@@ -26,7 +26,7 @@ import org.fusesource.stomp.jms.message.StompJmsMessage;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
-@Every("30s")
+@Every("300s")
 
 
 public class ProcureJobs extends Job {
@@ -56,14 +56,15 @@ public class ProcureJobs extends Job {
 	}
 
 	
-public String consumer() throws JMSException, InterruptedException{
+public String consumer() throws JMSException, InterruptedException
+{
 	String user = "admin";
 	String password = "password";
 	String host = "54.215.210.214";
 	int port = 61613;
-	System.out.println("============CONSUMER============");
+	System.out.println("=====================CONSUMER===================");
 	String queue = "/queue/70742.book.orders";
-	//String destination = queue;
+	
 
 	StompJmsConnectionFactory factory = new StompJmsConnectionFactory();
 	factory.setBrokerURI("tcp://" + host + ":" + port);
@@ -75,10 +76,10 @@ public String consumer() throws JMSException, InterruptedException{
 	MessageConsumer consumer = session.createConsumer(dest);
 	System.out.println("Waiting for messages from " + queue + "...");
 	while(true) {
-		System.out.println("test1");
+		System.out.println("Check 1");
 	    Message msg = consumer.receive(5000);
 	    if(msg==null){
-	    	System.out.println("test2");
+	    	System.out.println("Check 2");
 	    	break;
 	    }
 	    if( msg instanceof  TextMessage ) {
@@ -94,11 +95,12 @@ public String consumer() throws JMSException, InterruptedException{
 	String lostIsbn = tempString.toString();
 	connection.close();
 	return lostIsbn;
+	
 	}
 
 public void HttpPOST(String lostBooks){
 	
-	System.out.println("==========POST============");
+	System.out.println("================POST===================");
 	Client client = Client.create(); 
 	System.out.println(lostBooks);
 	String msg = "{\"id\" : \"70742\",\"order_book_isbns\":"+lostBooks+"}";
@@ -155,8 +157,7 @@ public void Publisher(ArrayList<String> arrivedBooks) throws JMSException{
 	Destination dest_lib_b = new StompJmsDestination(destination2);
 	MessageProducer producer_a = session.createProducer(dest_lib_a);
 	MessageProducer producer_b = session.createProducer(dest_lib_b);
-	//producer_a.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
-	//producer_b.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
+	
 
 	String data;
 	for (int i = 0; i < arrivedBooks.size(); i++) {
@@ -175,7 +176,7 @@ public void Publisher(ArrayList<String> arrivedBooks) throws JMSException{
 	 * Notify all Listeners to shut down. if you don't signal them, they
 	 * will be running forever.
 	 */
-	//producer_a.send(session.createTextMessage("SHUTDOWN"));
+	
 	connection.close();
 
     }
