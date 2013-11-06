@@ -23,6 +23,7 @@ public class Book {
 
 	@Override
 	public String toString() {
+		
 	    return this.getValue();
 	}
 
@@ -128,5 +129,13 @@ public class Book {
     public void setStatus(Status status) {
 	this.status = status;
     }
+    
+    @Override
+    public String toString() {
+            return "Book [isbn=" + isbn + ", title=" + title + ", category="
+                            + category + ", coverimage=" + coverimage + ", status="
+                            + status + "]";
+    }
+
 
 }

@@ -13,6 +13,8 @@ import javax.jms.Connection;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.MessageProducer;
+import javax.jms.Message;
+import javax.jms.MessageConsumer;
 
 import javax.jms.Session;
 import javax.jms.TextMessage;
@@ -25,6 +27,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import edu.sjsu.cmpe.library.config.LibraryServiceConfiguration;
 import edu.sjsu.cmpe.library.domain.Book;
+import edu.sjsu.cmpe.library.messaging.Producer;
 import edu.sjsu.cmpe.library.domain.Book.Status;
 
 @SuppressWarnings("unused")
@@ -32,6 +35,9 @@ public class BookRepository implements BookRepositoryInterface {
     /** In-memory map to store books. (Key, Value) -> (ISBN, Book) */
     private final ConcurrentHashMap<Long, Book> bookInMemoryMap;
     private final LibraryServiceConfiguration configuration;
+    
+    
+    
 
     /** Never access this key directly; instead use generateISBNKey() */
     private long isbnKey;
@@ -49,19 +55,24 @@ public class BookRepository implements BookRepositoryInterface {
     private int apolloPort;
     
     private String stompQueue;
+    
+    private final Producer producer;
+    
       
     
     public BookRepository(LibraryServiceConfiguration config) {
-        bookInMemoryMap = seedData();
-        this.configuration = config;
-        System.out.println("checkpoint");
-        apolloUser = configuration.getApolloUser();
-        apolloPassword = configuration.getApolloPassword();
-        apolloHost = configuration.getApolloHost();
-        apolloPort = configuration.getApolloPort();
-        stompQueue = configuration.getStompQueueName();
-        System.out.println(apolloUser);
-	isbnKey = 0;
+    	bookInMemoryMap = seedData();
+    	this.configuration = config;
+    	System.out.println("checkpoint");
+    	this.producer = new Producer(config);
+    	apolloUser = configuration.getApolloUser();
+    	apolloPassword = configuration.getApolloPassword();
+    	apolloHost = configuration.getApolloHost();
+    	apolloPort = configuration.getApolloPort();
+    	stompQueueName = configuration.getStompQueueName();
+    	stompTopicName = configuration.getStompTopicName();
+    	System.out.println(apolloUser);
+	isbnKey = 2;
     }
 
     private ConcurrentHashMap<Long, Book> seedData(){
@@ -123,10 +134,19 @@ public class BookRepository implements BookRepositoryInterface {
      * @see edu.sjsu.cmpe.library.repository.BookRepositoryInterface#getBookByISBN(java.lang.Long)
      */
     @Override
-    public Book getBookByISBN(Long isbn) {
+    public Book getBookByISBN(Long isbn) 
+    {
 	checkArgument(isbn > 0,
 		"ISBN was %s but expected greater than zero value", isbn);
-	return bookInMemoryMap.get(isbn);
+	if(bookInMemoryMap.containsKey(isbn)) {
+        //System.out.println("returning book..");
+        return bookInMemoryMap.get(isbn);
+}
+	else {
+        //System.out.println("returning null");
+        Book book = new Book();
+        return book;
+}
     }
 
     @Override
@@ -142,23 +162,41 @@ public class BookRepository implements BookRepositoryInterface {
      * edu.sjsu.cmpe.library.repository.BookRepositoryInterface#delete(java.
      * lang.Long)
      */
+    
+    @Override
+    public void delete(Long isbn) 
+    
+    {
+	    bookInMemoryMap.remove(isbn);
+    }
+    
+    public void addBook(Book tempBook) 
+    
+    {
+    	checkNotNull(tempBook, "newBook instance must not be null");
+    	System.out.println(tempBook.getTitle());
+    	bookInMemoryMap.put(tempBook.getIsbn(), tempBook);
+    }
+    
    
     @Override
-    public Book updateBookStatus(Book book, Status tempStatus) throws JMSException{
-           book.setStatus(tempStatus); 
-           System.out.println("checkpint2");
-           String libraryname;
-           if(configuration.getStompTopicName().equals("/topic/70752.book.*"))
-                   libraryname = "library-a";
-           else
-                   libraryname = "library-b";
-           producer(libraryname+":"+book.getIsbn());
-           System.out.println("checkpint3");
-    return book;
+	public Book updateBookStatus(Book book, Status tempStatus) throws JMSException{
+		book.setStatus(tempStatus); 
+		//System.out.println("checkpint2");
+		String libname;
+		if(configuration.getStompTopicName().equals("/topic/70742.book.all"))
+			libname = "library-a";
+		else
+			libname = "library-b";
+		producer.producer(libname+":"+book.getIsbn());
+		//System.out.println("checkpint3");
+	return book;
 }
+    /*
+    public void producer(String tempMsg) throws JMSException
     
-    public void producer(String tempMsg) throws JMSException{
-        System.out.println("checkpint4");
+    {
+        System.out.println("checkpoint3");
         StompJmsConnectionFactory factory = new StompJmsConnectionFactory();
         factory.setBrokerURI("tcp://" + apolloHost + ":" + apolloPort);
         System.out.println(factory.getBrokerURI());
@@ -178,11 +216,5 @@ public class BookRepository implements BookRepositoryInterface {
         connection.close();
 
     }
-    	
-    
-    @Override
-    public void delete(Long isbn) {
-	bookInMemoryMap.remove(isbn);
-    }
-
-}
+    	*/
+  }
