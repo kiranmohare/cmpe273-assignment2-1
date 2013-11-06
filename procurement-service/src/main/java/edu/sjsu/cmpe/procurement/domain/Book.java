@@ -5,8 +5,7 @@ public class Book {
     private long isbn;
     private String title;
 
-    // add more fields here
-
+   
     /**
      * @return the isbn
      */
